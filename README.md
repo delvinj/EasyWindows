@@ -15,8 +15,6 @@ Resize and move windows without having to find the edges first.
 
 ### See also
 
-This app was directly inspired by `EasyWindows.ahk` for AutoHotkey.
-
-### 
+This app was inspired by several different Autohotkey scripts. For example: https://www.autohotkey.com/board/topic/22565-updated-easywindowdrag-kdeahk-with-added-control-support/
 
 _Version 1 VibeCoded on 2026-10-23._
