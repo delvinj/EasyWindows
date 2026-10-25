@@ -4,4 +4,4 @@ build/
 out/
 SciTE.properties
 *.aps
-./localbuild.bat
+/localbuild.bat
