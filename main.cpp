@@ -103,6 +103,9 @@ namespace
 
     if (mode == DragMode::Resize)
     {
+      //
+      // Determine which sides of the bounding rectangle to modify.
+      //
       const int midX = rect.left + (rect.right - rect.left) / 2;
       const int midY = rect.top + (rect.bottom - rect.top) / 2;
 
@@ -181,7 +184,9 @@ namespace
     
 #endif
     
-    // Finally resize or reposition the window.
+    //
+    // A window can refuse to change size if it wants to, so we will just ask nicely...
+    //
     SetWindowPos(
       g_targetWindow,
       nullptr,
@@ -194,7 +199,7 @@ namespace
   }
 
   //
-  // All done; stop intercepting target window messages.
+  // All done; stop intercepting mouse
   void StopDrag()
   {
     g_dragMode = DragMode::None;
@@ -216,7 +221,7 @@ namespace
     );
 
     AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
-    AppendMenuW(menu, MF_STRING, ID_TRAY_EXIT, L"Exit");
+    AppendMenuW(menu, MF_STRING, ID_TRAY_EXIT, L"E&xit");
 
     POINT cursor{};
     GetCursorPos(&cursor);
