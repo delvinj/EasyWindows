@@ -1,0 +1,4 @@
+#include "resource.h"
+
+IDI_TRAY_ENABLED   ICON  "resources/tray-enabled.ico"
+IDI_TRAY_DISABLED  ICON  "resources/tray-disabled.ico"
