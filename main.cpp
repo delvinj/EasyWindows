@@ -6,15 +6,6 @@
 
 #include "resource.h"
 
-/*
- * Vibe coded on 2026-10-23
- * 
- * SHIFT + LEFT mouse button to move target window
- * SHIFT + RIGHT mouse button to resize target window
- *
- * Reference: AutoHotkey 'EasyWindows' script
- */
-
 namespace
 { 
   constexpr UINT WM_TRAY_ICON    = WM_APP + 1;
@@ -48,20 +39,16 @@ namespace
   
   bool g_resizeFromLeft = false;
   bool g_resizeFromTop = false;
+  
+  void StopDrag();
 
   bool IsShiftDown()
   {
     return (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
   }
 
-  void StopDrag()
-  {
-    g_dragMode = DragMode::None;
-    g_targetWindow = nullptr;
-  }
-
   //
-  // Get target window handle, and validate that it can be manipulated.
+  // Get and validate target window
   HWND GetTargetWindowAtCursor(POINT point)
   {
     HWND hwnd = WindowFromPoint(point);
@@ -72,11 +59,9 @@ namespace
     // Resolve a child control to its top-level application window.
     hwnd = ::GetAncestor(hwnd, GA_ROOT);
 
-    // More checks
     if (!hwnd || hwnd == g_messageWindow) 
       return nullptr;
     
-    // More checks
     if (!::IsWindow(hwnd) || !::IsWindowVisible(hwnd) || hwnd == ::GetDesktopWindow())
     {
       return nullptr;
@@ -92,6 +77,8 @@ namespace
     return hwnd;
   }
 
+  //
+  // Setup initial drag state
   bool BeginDrag(DragMode mode)
   {
     POINT cursor{};
@@ -126,6 +113,8 @@ namespace
     return true;
   }
   
+  //
+  // Continuing drag operation - called from hook
   void UpdateDrag(POINT cursor)
   {
     if (g_dragMode == DragMode::None || !g_targetWindow)
@@ -204,6 +193,14 @@ namespace
     );
   }
 
+  //
+  // All done; stop intercepting target window messages.
+  void StopDrag()
+  {
+    g_dragMode = DragMode::None;
+    g_targetWindow = nullptr;
+  }
+
   void ShowTrayMenu(HWND hwnd)
   {
     HMENU menu = CreatePopupMenu();
@@ -258,7 +255,8 @@ namespace
       reinterpret_cast<const MSLLHOOKSTRUCT*>(lParam);
 
     // 
-    // Return '1' to suppress the event for the target window.
+    // Messages are intercepted while drag occuring - otherwise you'd
+    // get unwanted context menu / text selection etc.
     switch (wParam)
     {
       case WM_LBUTTONDOWN:
@@ -274,7 +272,7 @@ namespace
       case WM_MOUSEMOVE:
         if (g_dragMode != DragMode::None)
         {
-          // Not suppressed
+          // WM_MOUSEMOVE is safe to pass through to target.
           UpdateDrag(mouse->pt);
         }
         break;
